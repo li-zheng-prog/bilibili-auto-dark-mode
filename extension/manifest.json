@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "哔哩哔哩主题跟随系统",
-  "version": "1.0.1",
+  "name": "Bili Theme Sync",
+  "version": "1.0.0",
   "description": "让哔哩哔哩原生深浅色主题跟随系统，保留临时手动切换。",
   "minimum_chrome_version": "111",
   "icons": {
