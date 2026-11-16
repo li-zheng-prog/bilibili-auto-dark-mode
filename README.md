@@ -1,43 +1,45 @@
-# 哔哩哔哩主题跟随系统
+# Bili Theme Sync
 
-一个仅用于同步系统深浅色主题的 Microsoft Edge / Chromium 扩展。
+A lightweight Microsoft Edge / Chromium extension that keeps Bilibili's native light and dark themes in sync with your system appearance.
 
-## 安装
+## Installation
 
-1. 在 Edge 地址栏输入 `edge://extensions`。
-2. 打开「开发人员模式」，点击「加载解压缩的扩展」。
-3. 选择本项目的 `extension` 文件夹（其中直接包含 `manifest.json`）。
-4. 刷新已经打开的 B 站页面。
+1. Open `edge://extensions` in Microsoft Edge.
+2. Enable **Developer mode** and click **Load unpacked**.
+3. Select this project's `extension` folder, which contains `manifest.json` directly.
+4. Refresh any Bilibili tabs that are already open.
 
-也可以从 [Releases](https://github.com/li-zheng-prog/bilibili-auto-dark-mode/releases) 下载对应版本的 zip，解压后选择解压出的文件夹加载。
+You can also download a versioned ZIP archive from [Releases](https://github.com/li-zheng-prog/bilibili-auto-dark-mode/releases), extract it, and load the extracted folder.
 
-安装后无需设置。需要 Edge 111 或更新版本。
+No configuration is needed after installation. Requires Edge 111 or later.
 
-升级到 1.0.1：如果加载的是本项目的 `extension` 文件夹，在扩展管理页点击「重新加载」，确认版本显示为 1.0.1，然后刷新所有 B 站标签页。如果安装时使用的是解压出来的文件夹，请先将新版本压缩包解压并覆盖该文件夹，再重新加载扩展；修改本项目不会自动更新另一处安装目录。
+**Upgrading to 1.0.1:** If you loaded this project's `extension` folder, click **Reload** on the extensions page, confirm that the version is 1.0.1, and refresh all Bilibili tabs. If you installed from an extracted archive, replace the files in that installation folder with the new release before reloading the extension. Changes to this project do not automatically update a separate installation folder.
 
-## 行为
+## How it works
 
-- 打开或刷新页面时，原生主题跟随系统。
-- 系统深浅色模式改变时，已经打开的页面同步切换，无需刷新。
-- 在 B 站手动切换主题后，当前页面保留该选择，直到下次刷新或系统主题变化。
-- 仅处理提供原生主题样式入口的页面；没有入口的页面保持原样。
-- 使用系统的「应用模式」所对应的 `prefers-color-scheme`；Windows 自定义模式下，应用模式和 Windows 模式可以不同。
+- Bilibili's native theme follows your system appearance when you open or refresh a page.
+- Open pages switch automatically when your system changes between light and dark mode, without a refresh.
+- Switching themes manually on Bilibili keeps your choice for the current page until the next refresh or system theme change.
+- Only pages with supported native theme controls or styles are updated. Other pages remain unchanged.
+- The extension follows `prefers-color-scheme`, which reflects the system's app mode. In Windows Custom mode, the app mode can differ from the Windows mode.
 
-## 体积与权限
+## Footprint and permissions
 
-扩展由 `extension/manifest.json`、`extension/theme.js` 和 `extension/icons` 图标组成，无需构建、依赖、后台服务、设置页或扩展 API 权限。脚本仅在 HTTPS 的 B 站主域及子域顶层页面运行，不进入内嵌播放器。
+The extension consists of `extension/manifest.json`, `extension/theme.js`, and the icons in `extension/icons`. It requires no build step, runtime dependencies, background service, settings page, or extension API permissions. The script runs only in top-level HTTPS pages on Bilibili's main domain and subdomains, not inside embedded players.
 
-扩展复用 B 站的 `__css-map__` 原生主题样式、首页的 `bili_dark` 类、`theme_style` Cookie 和 `biliThemeChange` 事件。导航栏已挂载时，优先调用其主题切换事件，让菜单与页面内部状态一并更新。扩展本身不发送网络请求，不读取账号 Cookie；原生主题文件仍由 B 站 CDN 加载。
+It reuses Bilibili's native `__css-map__` theme styles, the homepage's `bili_dark` class, the `theme_style` cookie, and the `biliThemeChange` event. When the navigation bar is mounted, the extension prefers its theme-switching event so that the menu and internal page state update together. The extension itself sends no network requests and does not read account cookies. Native theme files are still loaded from Bilibili's CDN.
 
-1.0.1 修复了首页使用原生 CSS 类却被跳过、异步加载的入口未被发现、页面初始化恢复旧主题及页面内跳转后入口被替换的问题。等待组件通过 DOM 变化触发并合并执行，没有定时轮询。手动操作与初始化事件分开处理，避免自动同步被旧状态覆盖。
+Version 1.0.1 fixes skipped homepages that use native CSS classes, undetected theme elements loaded asynchronously, old themes restored during page initialization, and theme elements replaced during in-page navigation. DOM changes trigger batched updates as components become available; there is no timer-based polling. Manual actions are handled separately from initialization events to prevent stale state from overriding automatic synchronization.
 
-兼容边界：B 站不同页面、账号和灰度版本的原生主题支持可能不同。2026-11-04 已核对首页的 `bili_dark` 及视频页的主题样式入口。没有原生支持的页面仍不注入自定义配色。若 B 站更改入口或导航栏内部结构，需要调整适配。
+**Compatibility:** Native theme support can vary across Bilibili pages, accounts, and staged rollouts. The homepage's `bili_dark` class and video pages' theme stylesheet elements were checked on November 4, 2026. The extension does not inject custom colors into pages without native support. Changes to Bilibili's theme elements or navigation bar internals may require updates to the extension.
 
-## 验证
+## Testing
 
-`tests/browser.cjs` 使用 Playwright 和本机 Edge，在独立临时配置中加载实际扩展，验证系统主题、手动切换、刷新、延迟入口、原生滤镜及不支持的页面。测试依赖不随扩展发布。
+`tests/browser.cjs` uses Playwright and a locally installed copy of Edge to load the actual extension in an isolated temporary browser profile. It checks system themes, manual switching, refreshes, delayed theme elements, native filters, and unsupported pages. Test dependencies are not shipped with the extension.
 
-测试页面和样式通过请求拦截提供，以稳定验证行为，不需要登录 B 站。可额外将 `BILI_HEADER_PATH` 环境变量设为从 B 站下载的当前 `bili-header.umd.js` 文件路径，以验证真实导航栏的主题回调、手动切换与状态同步；将 `BILI_HOME_CSS_PATH` 设为当前首页样式文件路径，可验证真实样式的背景颜色双向切换。1.0.1 已在 Edge 独立测试配置中通过包含这两个官方资源的 18 项检查；系统主题变化用浏览器媒体特性模拟，未修改用户的 Windows 主题。
+Test pages and styles are supplied through request interception for repeatable checks, with no Bilibili login required. Optionally, set `BILI_HEADER_PATH` to the path of a current `bili-header.umd.js` file downloaded from Bilibili to check the real navigation bar's theme callbacks, manual switching, and state synchronization. Set `BILI_HOME_CSS_PATH` to the path of the current homepage stylesheet to check background color changes in both directions using the real styles.
+
+Version 1.0.1 passed 18 checks in an isolated Edge test profile with both official resources included. System theme changes were simulated through browser media emulation; the user's Windows theme was not changed.
 
 ```powershell
 npm install --prefix "$env:TEMP\bili-theme-test-tools" playwright@1.64.1 --no-audit --no-fund
